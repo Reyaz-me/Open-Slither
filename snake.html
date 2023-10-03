@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Snake Game</title>
+    <link rel="stylesheet" href="style.css">
+<style>
+  body {
+    margin: 0;
+    overflow: hidden;
+}
+
+.game {
+    width: 400px;
+    height: 400px;
+    background-color: #87CEEB;
+    position: relative;
+}
+
+.snake {
+    width: 20px;
+    height: 20px;
+    background-color: #00FF00;
+    position: absolute;
+}
+
+.food {
+    width: 20px;
+    height: 20px;
+    background-color: #FF0000;
+    position: absolute;
+}
+</style>
+</head>
+<body>
+    <div class="game">
+        <div class="snake" id="snake"></div>
+        <div class="food" id="food"></div>
+    </div>
+    <script src="script.js">
+      const snake = document.getElementById('snake');
+const food = document.getElementById('food');
+const gridSize = 20;
+const gameSize = 400;
+let snakeX = 0;
+let snakeY = 0;
+let foodX = 0;
+let foodY = 0;
+let snakeDX = gridSize;
+let snakeDY = 0;
+let tail = [];
+let tailLength = 1;
+
+function randomPosition() {
+    return Math.floor(Math.random() * (gameSize / gridSize)) * gridSize;
+}
+
+function updateGameArea() {
+    // Move the snake
+    snakeX += snakeDX;
+    snakeY += snakeDY;
+    
+    // Check for collisions with the wall
+    if (snakeX < 0 || snakeX >= gameSize || snakeY < 0 || snakeY >= gameSize) {
+        clearInterval(gameInterval);
+        alert('Game Over! Your Score: ' + tailLength);
+        return;
+    }
+
+    // Check for collisions with the food
+    if (snakeX === foodX && snakeY === foodY) {
+        tailLength++;
+        foodX = randomPosition();
+        foodY = randomPosition();
+    }
+
+    // Move the tail
+    tail.unshift({ x: snakeX, y: snakeY });
+    if (tail.length > tailLength) {
+        tail.pop();
+    }
+
+    // Check for collisions with the tail
+    for (let i = 1; i < tail.length; i++) {
+        if (snakeX === tail[i].x && snakeY === tail[i].y) {
+            clearInterval(gameInterval);
+            alert('Game Over! Your Score: ' + tailLength);
+            return;
+        }
+    }
+
+    // Update the game area
+    snake.style.left = snakeX + 'px';
+    snake.style.top = snakeY + 'px';
+    food.style.left = foodX + 'px';
+    food.style.top = foodY + 'px';
+}
+
+document.addEventListener('keydown', changeDirection);
+
+function changeDirection(event) {
+    switch (event.key) {
+        case 'ArrowUp':
+            if (snakeDY !== gridSize) {
+                snakeDX = 0;
+                snakeDY = -gridSize;
+            }
+            break;
+        case 'ArrowDown':
+            if (snakeDY !== -gridSize) {
+                snakeDX = 0;
+                snakeDY = gridSize;
+            }
+            break;
+        case 'ArrowLeft':
+            if (snakeDX !== gridSize) {
+                snakeDX = -gridSize;
+                snakeDY = 0;
+            }
+            break;
+        case 'ArrowRight':
+            if (snakeDX !== -gridSize) {
+                snakeDX = gridSize;
+                snakeDY = 0;
+            }
+            break;
+    }
+}
+
+// Initialize the game
+foodX = randomPosition();
+foodY = randomPosition();
+let gameInterval = setInterval(updateGameArea, 100);
+    </script>
+</body>
+</html>
